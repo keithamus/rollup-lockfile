@@ -1,5 +1,5 @@
-const {join, basename} = require('path')
-const {writeFileSync, unlinkSync} = require('fs')
+const {join, basename, dirname} = require('path')
+const {mkdirSync, writeFileSync, unlinkSync} = require('fs')
 module.exports = function lockfile({ dir = '', name = name => join(dir, basename(name) + '.lock')}) {
   const lockfiles = {}
   return {
@@ -7,6 +7,7 @@ module.exports = function lockfile({ dir = '', name = name => join(dir, basename
     buildStart({input}) {
       for(const file of input) {
         let lockfile = lockfiles[basename(file)] = name(file)
+        mkdirSync(dirname(lockfile), { recursive: true })
         writeFileSync(lockfile)
       }
     },
