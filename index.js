@@ -1,22 +1,36 @@
 const {join, basename, dirname} = require('path')
 const {mkdirSync, writeFileSync, unlinkSync} = require('fs')
 module.exports = function lockfile({ dir = '', name = name => join(dir, basename(name) + '.lock')}) {
-  const lockfiles = {}
+  let lockfiles = {}
+
+  const deleteAllLockfiles = () => {
+    for (const [name, file] of Object.entries(lockfiles)) {
+      unlinkSync(file)
+    }
+  }
+
   return {
     name: 'lockfile',
     buildStart({input}) {
+      // reset tracked lockfiles for this build
+      lockfiles = {}
+
+      // lock each input file
       for(const file of input) {
         let lockfile = lockfiles[basename(file)] = name(file)
         mkdirSync(dirname(lockfile), { recursive: true })
         writeFileSync(lockfile)
       }
     },
-    generateBundle(outputOpts, bundles) {
-      for(const [name, bundle] of Object.entries(bundles)) {
-        if (bundle.isEntry) {
-          unlinkSync(lockfiles[basename(bundle.facadeModuleId)])
-        }
+    buildEnd(error) {
+      // if there is a build failure, release locks
+      if (error) {
+        deleteAllLockfiles()
       }
+    },
+    writeBundle(outputOpts, bundles) {
+      // After the output has been written, delete all lockfiles
+      deleteAllLockfiles()
     }
   }
 }
