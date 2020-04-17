@@ -11,7 +11,7 @@ That's it!
 
 Lockfiles will be generated based on the input name(s), in the `dir` directory.
 
-```
+```js
 // rollup.config.js
 import typescript from 'rollup-plugin-typescript';
 
@@ -29,7 +29,7 @@ export default {
 
 The full filename can be configured by passing `name`
 
-```
+```js
 // rollup.config.js
 import typescript from 'rollup-plugin-typescript';
 
