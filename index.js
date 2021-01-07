@@ -1,11 +1,13 @@
 const {join, basename, dirname} = require('path')
-const {mkdirSync, writeFileSync, unlinkSync} = require('fs')
+const {existsSync, mkdirSync, writeFileSync, unlinkSync} = require('fs')
 module.exports = function lockfile({ dir = '', name = name => join(dir, basename(name) + '.lock')}) {
   let lockfiles = {}
 
   const deleteAllLockfiles = () => {
     for (const [name, file] of Object.entries(lockfiles)) {
-      unlinkSync(file)
+      if (existsSync(file)) {
+        unlinkSync(file)
+      }
     }
   }
 
