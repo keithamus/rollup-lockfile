@@ -19,7 +19,7 @@ module.exports = function lockfile({ dir = '', name = name => join(dir, basename
       for(const file of input) {
         let lockfile = lockfiles[basename(file)] = name(file)
         mkdirSync(dirname(lockfile), { recursive: true })
-        writeFileSync(lockfile)
+        writeFileSync(lockfile, "")
       }
     },
     buildEnd(error) {
